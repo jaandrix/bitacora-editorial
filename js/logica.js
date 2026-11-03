@@ -10,7 +10,7 @@ window.ED.apartados = window.ED.apartados || {};
   var ARCHIVOS = ['nucleo', 'datos', 'interfaz', 'planificador', 'entradas', 'calendario', 'resumen', 'ocio', 'viajes',
     'trabajo-estudios', 'agenda-laboral', 'enlaces-proyectos', 'eventos', 'ajustes', 'notas-objetivos', 'finanzas',
     'finanzas-pro', 'presupuesto', 'suscripciones', 'documentos', 'vault', 'conector', 'compra', 'proyecto', 'apuntar',
-    'universidad', 'servicios'];
+    'universidad', 'servicios', 'asistente'];
 
   async function versionPublicada() {
     try {
