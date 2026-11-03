@@ -58,27 +58,42 @@ a:hover, a:focus-visible { text-decoration: underline; text-underline-offset: .2
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* ACCESO: solo el paisaje y dos casillas, a la derecha, a la altura de la columna del boletín de la referencia */
+/* ACCESO: solo el paisaje y las casillas, pequeñas y centradas en el cielo */
 .acceso {
   position: fixed;
-  top: calc(198 * var(--u));
-  right: var(--margen-x);
-  width: calc(217 * var(--u));
-  min-width: 220px;
-  display: flex; flex-direction: column; gap: calc(12 * var(--u));
+  top: calc(150 * var(--u));
+  left: 0; right: 0; margin-inline: auto;
+  width: max(190px, calc(180 * var(--u)));
+  display: flex; flex-direction: column; gap: calc(9 * var(--u));
   transition: opacity 240ms ease-out, transform 240ms ease-out;
 }
 .acceso.saliendo { opacity: 0; transform: translateY(-4px); pointer-events: none; }
 .acceso[hidden] { display: none; }
+.acceso .casilla, .acceso .otros { transition: opacity 160ms ease-out; }
+.acceso.cambiando .casilla, .acceso.cambiando .otros, .acceso.cambiando .error { opacity: 0; }
+.casilla[hidden] { display: none; }
+.otros {
+  display: flex; gap: 0; flex-wrap: nowrap; white-space: nowrap; justify-content: center;
+  font: italic max(12.5px, calc(12.6 * var(--u))) / 1 var(--serif);
+  padding-top: calc(2 * var(--u));
+}
+.otros button {
+  background: none; border: 0; padding: 4px 0; color: var(--papel); font: inherit; cursor: pointer; opacity: .55;
+  transition: opacity 160ms ease;
+}
+.otros button:hover, .otros button:focus-visible { opacity: 1; text-decoration: underline; text-underline-offset: .22em; text-decoration-thickness: 1px; outline: none; }
+.otros .sep { opacity: .4; padding: 4px .55em; }
+.aviso { margin: 0; text-align: center; font: italic max(13px, calc(12.5 * var(--u))) / 1.35 var(--serif); }
+.aviso:empty { display: none; }
 .casilla {
   width: 100%;
-  height: max(36px, calc(36 * var(--u)));
-  padding: 0 calc(16 * var(--u));
+  height: max(30px, calc(29 * var(--u)));
+  padding: 0 calc(12 * var(--u));
   background: transparent;
   color: var(--papel);
   border: 1px solid color-mix(in srgb, var(--papel) 82%, transparent);
   border-radius: 0;
-  font: italic max(14px, calc(13.5 * var(--u))) / 1 var(--serif);
+  font: italic max(12.5px, calc(12 * var(--u))) / 1 var(--serif);
   outline: none;
   transition: border-color 160ms ease;
 }
@@ -90,7 +105,7 @@ a:hover, a:focus-visible { text-decoration: underline; text-underline-offset: .2
   caret-color: var(--papel);
 }
 .error {
-  margin: 0; padding-top: 6px;
+  margin: 0; padding-top: 6px; text-align: center;
   border-top: 1px solid var(--coral);
   font: italic max(13px, calc(12.5 * var(--u))) / 1.35 var(--serif);
 }
@@ -195,7 +210,7 @@ a:hover, a:focus-visible { text-decoration: underline; text-underline-offset: .2
   body { overflow: auto; position: relative; }
   /* El paisaje cierra la página en vez de quedarse fijo: el menú es más alto que la pantalla y se metía en él */
   .paisaje { position: absolute; inset: auto 0 0 0; height: 72vh; -webkit-mask-size: cover; mask-size: cover; }
-  .acceso { top: 30vh; left: 16px; right: 16px; width: auto; }
+  .acceso { top: 26vh; width: min(240px, calc(100vw - 32px)); }
   .menu {
     position: relative; left: auto; right: auto; top: auto;
     padding: calc(28px + env(safe-area-inset-top)) 16px 30vh;
@@ -230,8 +245,12 @@ a:hover, a:focus-visible { text-decoration: underline; text-underline-offset: .2
   <input class="casilla" id="usuario" name="usuario" type="email" inputmode="email" autocomplete="username" placeholder="usuario" autocapitalize="none" spellcheck="false" required>
   <label class="oculto" for="clave">contraseña</label>
   <input class="casilla" id="clave" name="clave" type="password" autocomplete="current-password" placeholder="contraseña" required>
+  <label class="oculto" for="clave2">repetir contraseña</label>
+  <input class="casilla" id="clave2" name="clave2" type="password" autocomplete="new-password" placeholder="repetir contraseña" hidden>
   <div class="carga" aria-hidden="true"></div>
   <p class="error" id="error" role="alert"></p>
+  <p class="aviso" id="aviso" role="status"></p>
+  <div class="otros" id="otros"></div>
   <button class="oculto" type="submit" tabindex="-1">entrar</button>
 </form>
 
@@ -335,11 +354,61 @@ a:hover, a:focus-visible { text-decoration: underline; text-underline-offset: .2
     return new Intl.DateTimeFormat('es-ES', { timeZone: 'Europe/Madrid', hour: '2-digit', minute: '2-digit' }).format(new Date());
   }
 
+  // Tres modos sobre las mismas casillas: entrar, crear cuenta y recuperar contraseña
+  var modo = 'entrar';
+  var ENLACES = {
+    entrar: [['crear', 'crear cuenta'], ['recuperar', 'recuperar contraseña']],
+    crear: [['entrar', 'ya tengo cuenta']],
+    recuperar: [['entrar', 'volver a entrar']]
+  };
+  var campoUsuario = document.getElementById('usuario');
+  var campoClave = document.getElementById('clave');
+  var campoClave2 = document.getElementById('clave2');
+  var aviso = document.getElementById('aviso');
+  var otros = document.getElementById('otros');
+
+  function pintarModo(m) {
+    modo = m;
+    campoClave.hidden = m === 'recuperar';
+    campoClave2.hidden = m !== 'crear';
+    campoClave.autocomplete = m === 'crear' ? 'new-password' : 'current-password';
+    campoClave.value = ''; campoClave2.value = '';
+    error.textContent = ''; aviso.textContent = '';
+    otros.innerHTML = '';
+    ENLACES[m].forEach(function (e, i) {
+      if (i) { var s = document.createElement('span'); s.className = 'sep'; s.textContent = '/'; otros.appendChild(s); }
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = e[1];
+      b.addEventListener('click', function () { cambiarModo(e[0]); });
+      otros.appendChild(b);
+    });
+  }
+  function cambiarModo(m) {
+    if (reducido) { pintarModo(m); campoUsuario.focus(); return; }
+    acceso.classList.add('cambiando');
+    setTimeout(function () {
+      pintarModo(m);
+      acceso.classList.remove('cambiando');
+      (campoUsuario.value ? (m === 'recuperar' ? campoUsuario : campoClave) : campoUsuario).focus();
+    }, 160);
+  }
+
   function verAcceso() {
     menu.hidden = true; menu.classList.remove('visible');
     acceso.hidden = false; acceso.classList.remove('saliendo', 'enviando');
-    document.getElementById('clave').value = '';
-    document.getElementById('usuario').focus();
+    pintarModo('entrar');
+    campoUsuario.focus();
+  }
+
+  // La misma comprobación que el alta de appbitacora.es (revisarContrasena en nucleo.js)
+  async function revisarContrasena(clave) {
+    if (clave.length < 8) return 'La contraseña debe tener al menos 8 caracteres.';
+    if (/^(.)\1+$/.test(clave) || /^(12345678|password|contraseña|qwertyui)/i.test(clave)) return 'Esa contraseña es demasiado fácil de adivinar.';
+    try {
+      var h = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-1', new TextEncoder().encode(clave)))).map(function (b) { return b.toString(16).padStart(2, '0'); }).join('').toUpperCase();
+      var r = await Promise.race([fetch('https://api.pwnedpasswords.com/range/' + h.slice(0, 5)), new Promise(function (_, mal) { setTimeout(function () { mal(new Error('sin respuesta')); }, 4000); })]);
+      if (r.ok && (await r.text()).split(/\r?\n/).some(function (l) { return l.indexOf(h.slice(5) + ':') === 0; })) return 'Esa contraseña ha aparecido en filtraciones de otras webs. Elige otra.';
+    } catch (e) {}
+    return '';
   }
   // Las casillas se desvanecen y el menú brota columna a columna, de izquierda a derecha
   function verMenu(usuario, conTransicion) {
@@ -370,17 +439,38 @@ a:hover, a:focus-visible { text-decoration: underline; text-underline-offset: .2
 
   acceso.addEventListener('submit', async function (ev) {
     ev.preventDefault();
-    var correo = document.getElementById('usuario').value.trim();
-    var clave = document.getElementById('clave').value;
-    if (!correo) { document.getElementById('usuario').focus(); return; }
-    if (!clave) { document.getElementById('clave').focus(); return; }
+    if (acceso.classList.contains('enviando')) return;
+    var correo = campoUsuario.value.trim();
+    var clave = campoClave.value;
+    if (!correo) { campoUsuario.focus(); return; }
+    if (modo !== 'recuperar' && !clave) { campoClave.focus(); return; }
+    if (modo === 'crear' && !campoClave2.value) { campoClave2.focus(); return; }
     if (!sb) { error.textContent = 'Sin conexión con Bitácora. Prueba de nuevo.'; return; }
-    error.textContent = '';
+    error.textContent = ''; aviso.textContent = '';
     acceso.classList.add('enviando');
-    var r = await sb.auth.signInWithPassword({ email: correo, password: clave });
-    acceso.classList.remove('enviando');
-    if (r.error) { error.textContent = mensajeError(r.error); document.getElementById('clave').select(); return; }
-    verMenu(r.data.user, true);
+    try {
+      if (modo === 'entrar') {
+        var r = await sb.auth.signInWithPassword({ email: correo, password: clave });
+        if (r.error) { error.textContent = mensajeError(r.error); campoClave.select(); return; }
+        verMenu(r.data.user, true);
+      } else if (modo === 'crear') {
+        var fallo = await revisarContrasena(clave);
+        if (!fallo && clave !== campoClave2.value) fallo = 'Las contraseñas no coinciden.';
+        if (fallo) { error.textContent = fallo; campoClave.focus(); return; }
+        var a = await sb.auth.signUp({ email: correo, password: clave });
+        if (a.error) { error.textContent = 'No se ha podido crear la cuenta: ' + a.error.message; return; }
+        if (a.data.session) { verMenu(a.data.user, true); return; }
+        campoClave.value = ''; campoClave2.value = '';
+        aviso.textContent = 'Cuenta creada. Confírmala desde el correo que te hemos enviado y vuelve a entrar.';
+      } else {
+        // El enlace del correo abre appbitacora.es, que ya sabe poner la contraseña nueva
+        var p = await sb.auth.resetPasswordForEmail(correo, { redirectTo: 'https://appbitacora.es/' });
+        if (p.error) { error.textContent = 'No se ha podido enviar el enlace: ' + p.error.message; return; }
+        aviso.textContent = 'Si la cuenta existe, te hemos enviado un enlace para elegir otra contraseña.';
+      }
+    } finally {
+      acceso.classList.remove('enviando');
+    }
   });
 
   document.getElementById('salir').addEventListener('click', async function () {
