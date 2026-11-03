@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="es">
+<html lang="es" data-tono="cobalto">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Bitácora#EditorialEdition</title>
+<title>Bitácora Editorial</title>
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#104A93">
 <link rel="icon" href="favicon-32.png">
@@ -11,280 +11,60 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;1,8..60,400&display=swap" rel="stylesheet">
 <link rel="preload" as="image" href="img/paisaje.webp" type="image/webp">
-<style>
-/* Tonos: la portada es siempre dos tintas. --tinta es el campo (cielo y trazo), --papel lo que brota de él.
-   Cambiar de tono es cambiar estas dos variables: el paisaje es una máscara y toma el color que le toque. */
-:root {
-  --tinta: #104A93;
-  --papel: #E8DDBD;
-  --coral: #E39A88;
-  --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
-  /* La retícula se mide sobre un pliego de 1200 px de ancho, el de la referencia */
-  --u: min(calc(100vw / 1200), calc(100vh / 675 * 1.15));
-  --margen-x: calc(78 * var(--u));
-}
-:root[data-tono="cobalto"]  { --tinta: #104A93; --papel: #E8DDBD; }
-:root[data-tono="profundo"] { --tinta: #153D78; --papel: #E8DDBD; }
-:root[data-tono="coral"]    { --tinta: #B85F50; --papel: #EFE4C8; --coral: #3A1E18; }
-:root[data-tono="registro"] { --tinta: #171713; --papel: #E8DDBD; }
-:root[data-tono="bosque"]   { --tinta: #22483A; --papel: #E6DCC0; }
-:root[data-tono="negativo"] { --tinta: #E8DDBD; --papel: #104A93; --coral: #B85F50; }
-
-* { box-sizing: border-box; }
-html, body { margin: 0; height: 100%; }
-body {
-  background: var(--tinta);
-  color: var(--papel);
-  font-family: var(--serif);
-  font-optical-sizing: auto;
-  -webkit-font-smoothing: antialiased;
-  overflow: hidden;
-  transition: background-color 420ms ease, color 420ms ease;
-}
-a { color: inherit; text-decoration: none; }
-a:hover, a:focus-visible { text-decoration: underline; text-underline-offset: .22em; text-decoration-thickness: 1px; outline: none; }
-
-.paisaje {
-  position: fixed; inset: 0;
-  background: var(--papel);
-  -webkit-mask: url("img/paisaje.webp") center bottom / cover no-repeat;
-          mask: url("img/paisaje.webp") center bottom / cover no-repeat;
-  transition: background-color 420ms ease;
-  pointer-events: none;
-}
-.grano {
-  position: fixed; inset: 0; pointer-events: none;
-  opacity: .07; mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-
-/* ACCESO: solo el paisaje y las casillas, pequeñas y centradas en el cielo */
-.acceso {
-  position: fixed;
-  top: calc(150 * var(--u));
-  left: 0; right: 0; margin-inline: auto;
-  width: max(190px, calc(180 * var(--u)));
-  display: flex; flex-direction: column; gap: calc(9 * var(--u));
-  transition: opacity 240ms ease-out, transform 240ms ease-out;
-}
-.acceso.saliendo { opacity: 0; transform: translateY(-4px); pointer-events: none; }
-.acceso[hidden] { display: none; }
-.acceso .casilla, .acceso .otros { transition: opacity 160ms ease-out; }
-.acceso.cambiando .casilla, .acceso.cambiando .otros, .acceso.cambiando .error { opacity: 0; }
-.casilla[hidden] { display: none; }
-.otros {
-  display: flex; gap: 0; flex-wrap: nowrap; white-space: nowrap; justify-content: center;
-  font: italic max(12.5px, calc(12.6 * var(--u))) / 1 var(--serif);
-  padding-top: calc(2 * var(--u));
-}
-.otros button {
-  background: none; border: 0; padding: 4px 0; color: var(--papel); font: inherit; cursor: pointer; opacity: .55;
-  transition: opacity 160ms ease;
-}
-.otros button:hover, .otros button:focus-visible { opacity: 1; text-decoration: underline; text-underline-offset: .22em; text-decoration-thickness: 1px; outline: none; }
-.otros .sep { opacity: .4; padding: 4px .55em; }
-.aviso { margin: 0; text-align: center; font: italic max(13px, calc(12.5 * var(--u))) / 1.35 var(--serif); }
-.aviso:empty { display: none; }
-.casilla {
-  width: 100%;
-  height: max(30px, calc(29 * var(--u)));
-  padding: 0 calc(12 * var(--u));
-  background: transparent;
-  color: var(--papel);
-  border: 1px solid color-mix(in srgb, var(--papel) 82%, transparent);
-  border-radius: 0;
-  font: italic max(12.5px, calc(12 * var(--u))) / 1 var(--serif);
-  outline: none;
-  transition: border-color 160ms ease;
-}
-.casilla::placeholder { color: var(--papel); opacity: .42; }
-.casilla:focus { border-color: var(--papel); }
-.casilla:-webkit-autofill {
-  -webkit-text-fill-color: var(--papel);
-  -webkit-box-shadow: 0 0 0 100px var(--tinta) inset;
-  caret-color: var(--papel);
-}
-.error {
-  margin: 0; padding-top: 6px; text-align: center;
-  border-top: 1px solid var(--coral);
-  font: italic max(13px, calc(12.5 * var(--u))) / 1.35 var(--serif);
-}
-.error:empty { display: none; }
-/* Carga: una línea fina que avanza bajo la contraseña */
-.carga { height: 1px; background: var(--papel); transform: scaleX(0); transform-origin: left; opacity: 0; }
-.acceso.enviando .carga { opacity: .9; animation: avanza 1.1s cubic-bezier(.3,.6,.3,1) infinite; }
-@keyframes avanza { 0% { transform: scaleX(0); } 70% { transform: scaleX(1); opacity: .9; } 100% { transform: scaleX(1); opacity: 0; } }
-.oculto { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
-
-/* MENÚ: misma distribución que la referencia, medida en unidades de su pliego */
-.menu {
-  position: fixed;
-  left: var(--margen-x); right: var(--margen-x);
-  top: calc(88 * var(--u));
-  display: grid;
-  grid-template-columns: calc(285 * var(--u)) calc(172 * var(--u)) calc(175 * var(--u)) calc(210 * var(--u)) 1fr;
-  grid-template-areas: "firma c1 c2 c3 c4";
-  column-gap: 0;
-}
-.menu[hidden] { display: none; }
-.menu > * { opacity: 0; transform: translateY(6px); }
-.menu.visible > * { opacity: 1; transform: none; transition: opacity 320ms ease-out, transform 320ms cubic-bezier(.2,.7,.2,1); }
-.menu.visible > :nth-child(1) { transition-delay: 0ms; }
-.menu.visible > :nth-child(2) { transition-delay: 60ms; }
-.menu.visible > :nth-child(3) { transition-delay: 110ms; }
-.menu.visible > :nth-child(4) { transition-delay: 160ms; }
-.menu.visible > :nth-child(5) { transition-delay: 210ms; }
-.menu.visible > :nth-child(6) { transition-delay: 260ms; }
-
-.firma-col { grid-area: firma; }
-.firma {
-  margin: calc(4 * var(--u)) 0 0;
-  font-weight: 400;
-  font-size: max(20px, calc(22.5 * var(--u)));
-  line-height: 1;
-  letter-spacing: -.005em;
-  white-space: nowrap;
-}
-.fecha {
-  margin: calc(26 * var(--u)) 0 0;
-  font-style: italic;
-  font-size: max(14px, calc(14.2 * var(--u)));
-  line-height: 1.45;
-  max-width: calc(215 * var(--u));
-}
-.datos { list-style: none; margin: calc(20 * var(--u)) 0 0; padding: 0; }
-.datos li {
-  display: flex; align-items: center; gap: calc(14 * var(--u));
-  font-size: max(13.5px, calc(14 * var(--u)));
-  line-height: 1;
-  margin-bottom: calc(12 * var(--u));
-}
-.datos svg { width: max(15px, calc(17 * var(--u))); height: max(15px, calc(17 * var(--u))); flex: none; fill: currentColor; }
-.acciones { margin-top: calc(34 * var(--u)); font-size: max(13.5px, calc(14 * var(--u))); display: flex; gap: calc(22 * var(--u)); }
-.acciones button { background: none; border: 0; padding: 0; color: inherit; font: inherit; cursor: pointer; }
-.acciones button:hover, .acciones button:focus-visible { text-decoration: underline; text-underline-offset: .22em; text-decoration-thickness: 1px; outline: none; }
-
-.col h2 {
-  margin: calc(6 * var(--u)) 0 0;
-  font-weight: 400;
-  font-size: max(12px, calc(13 * var(--u)));
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  line-height: 1;
-}
-.col h2::after { content: ""; display: block; width: calc(30 * var(--u)); min-width: 24px; height: 1px; background: currentColor; margin-top: calc(14 * var(--u)); }
-.col ul { list-style: none; margin: calc(16 * var(--u)) 0 0; padding: 0; }
-.col li { font-size: max(14px, calc(14.6 * var(--u))); line-height: 1; margin-bottom: calc(11.5 * var(--u)); }
-.c1 { grid-area: c1; } .c2 { grid-area: c2; } .c3 { grid-area: c3; } .c4 { grid-area: c4; }
-
-.c4 p { margin: calc(16 * var(--u)) 0 0; font-style: italic; font-size: max(13.5px, calc(13.8 * var(--u))); line-height: 1.45; }
-.tono-caja {
-  margin-top: calc(14 * var(--u));
-  display: flex; height: max(36px, calc(36 * var(--u)));
-  border: 1px solid color-mix(in srgb, var(--papel) 82%, transparent);
-}
-.tono-caja span { flex: 1; display: flex; align-items: center; padding: 0 calc(16 * var(--u)); font: italic max(13.5px, calc(13.5 * var(--u))) / 1 var(--serif); }
-.tono-caja button {
-  width: max(36px, calc(36 * var(--u))); border: 0; padding: 0; cursor: pointer;
-  background: var(--papel); color: var(--tinta);
-  display: grid; place-items: center;
-}
-.tono-caja svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.3; }
-
-.legal {
-  position: fixed;
-  right: var(--margen-x);
-  top: calc(350 * var(--u));
-  display: flex; align-items: center;
-  font: italic max(12.5px, calc(12.6 * var(--u))) / 1 var(--serif);
-}
-.legal a + a { border-left: 1px solid currentColor; margin-left: calc(18 * var(--u)); padding-left: calc(18 * var(--u)); }
-.legal { opacity: 0; transform: translateY(6px); }
-.menu.visible ~ .legal { opacity: 1; transform: none; transition: opacity 320ms ease-out 300ms, transform 320ms cubic-bezier(.2,.7,.2,1) 300ms; }
-.menu[hidden] ~ .legal { display: none; }
-
-/* Móvil: la firma arriba, las columnas en dos, el acceso a lo ancho */
-@media (max-width: 760px) {
-  :root { --u: 1px; }
-  html, body { height: auto; min-height: 100vh; min-height: 100dvh; }
-  body { overflow: auto; position: relative; }
-  /* El paisaje cierra la página en vez de quedarse fijo: el menú es más alto que la pantalla y se metía en él */
-  .paisaje { position: absolute; inset: auto 0 0 0; height: 72vh; -webkit-mask-size: cover; mask-size: cover; }
-  .acceso { top: 26vh; width: min(240px, calc(100vw - 32px)); }
-  .menu {
-    position: relative; left: auto; right: auto; top: auto;
-    padding: calc(28px + env(safe-area-inset-top)) 16px 30vh;
-    grid-template-columns: 1fr 1fr; grid-template-areas: "firma firma" "c1 c2" "c3 c4";
-    row-gap: 30px; column-gap: 16px;
-  }
-  .firma { font-size: clamp(21px, 6.6vw, 28px); }
-  .fecha { max-width: none; }
-  .acciones { margin-top: 18px; }
-  .legal { position: absolute; top: auto; right: 16px; left: 16px; bottom: 16px; justify-content: flex-start; color: var(--tinta); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .acceso, .menu.visible > *, .menu.visible ~ .legal { transition: opacity 100ms linear !important; transition-delay: 0ms !important; transform: none !important; }
-  .acceso.enviando .carga { animation: none; transform: scaleX(1); }
-}
-</style>
-<script>
-  (function () {
-    var t = 'cobalto';
-    try { t = localStorage.getItem('editorial.tono') || t; } catch (e) {}
-    document.documentElement.setAttribute('data-tono', t);
-  })();
-</script>
+<link rel="stylesheet" href="css/editorial.css?v=9">
 </head>
 <body>
-<div class="paisaje" aria-hidden="true"></div>
+<div class="paisaje" id="ed-paisaje" aria-hidden="true"></div>
 <div class="grano" aria-hidden="true"></div>
 
-<form class="acceso" id="acceso" hidden novalidate>
-  <label class="oculto" for="usuario">usuario</label>
-  <input class="casilla" id="usuario" name="usuario" type="email" inputmode="email" autocomplete="username" placeholder="usuario" autocapitalize="none" spellcheck="false" required>
-  <label class="oculto" for="clave">contraseña</label>
-  <input class="casilla" id="clave" name="clave" type="password" autocomplete="current-password" placeholder="contraseña" required>
-  <label class="oculto" for="clave2">repetir contraseña</label>
-  <input class="casilla" id="clave2" name="clave2" type="password" autocomplete="new-password" placeholder="repetir contraseña" hidden>
+<!-- PORTADA -->
+<p class="firma-portada" id="ed-firma" hidden>Bitácora Editorial</p>
+<button class="boton-esquina" id="ed-ajustes" type="button" aria-pressed="false" hidden>Ajustes</button>
+
+<form class="acceso" id="ed-acceso" hidden novalidate>
+  <label class="oculto" for="ed-usuario">usuario</label>
+  <input class="casilla" id="ed-usuario" type="email" inputmode="email" autocomplete="username" placeholder="usuario" autocapitalize="none" spellcheck="false">
+  <label class="oculto" for="ed-clave">contraseña</label>
+  <input class="casilla" id="ed-clave" type="password" autocomplete="current-password" placeholder="contraseña">
+  <label class="oculto" for="ed-clave2">repetir contraseña</label>
+  <input class="casilla" id="ed-clave2" type="password" autocomplete="new-password" placeholder="repetir contraseña" hidden>
   <div class="carga" aria-hidden="true"></div>
-  <p class="error" id="error" role="alert"></p>
-  <p class="aviso" id="aviso" role="status"></p>
-  <div class="otros" id="otros"></div>
+  <p class="error" id="ed-error" role="alert"></p>
+  <p class="aviso" id="ed-aviso" role="status"></p>
+  <div class="otros" id="ed-otros"></div>
   <button class="oculto" type="submit" tabindex="-1">entrar</button>
 </form>
 
-<main class="menu" id="menu" hidden>
-  <section class="firma-col">
-    <h1 class="firma" tabindex="-1" id="firma">Bitácora#EditorialEdition</h1>
-    <p class="fecha" id="fecha"></p>
+<main class="pliego" id="ed-menu" hidden>
+  <section>
+    <p class="fecha" id="ed-fecha"></p>
     <ul class="datos">
-      <li><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M8 20h84v60H8zM16 28v4l34 22 34-22v-4L50 50z" fill-rule="evenodd"/></svg><span id="correo"></span></li>
-      <li><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="40"/></svg><span id="sesion">sesión abierta</span></li>
-      <li><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 6c-19 0-33 14-33 32 0 24 33 56 33 56s33-32 33-56C83 20 69 6 50 6zm0 46a13 13 0 1 1 0-26 13 13 0 0 1 0 26z" fill-rule="evenodd"/></svg><span id="lugar">Madrid</span></li>
+      <li><span class="rotulo">Hoy</span><span class="valor" id="ed-hoy"></span></li>
+      <li><span class="rotulo">Próximo</span><span class="valor" id="ed-proximo"></span></li>
+      <li><span class="rotulo">Saldo</span><span class="valor" id="ed-saldo"></span></li>
+      <li><span class="rotulo" id="ed-ciudad">Tiempo</span><span class="valor" id="ed-tiempo"></span></li>
     </ul>
     <div class="acciones">
-      <a href="https://appbitacora.es/">Bitácora</a>
-      <button type="button" id="salir">Salir</button>
+      <button type="button" class="enlace" id="ed-salir">Salir</button>
     </div>
   </section>
 
-  <nav class="col c1" aria-labelledby="h-agenda">
+  <nav class="col" aria-labelledby="h-agenda">
     <h2 id="h-agenda">Agenda</h2>
     <ul>
-      <li><a href="https://appbitacora.es/#home">Hoy</a></li>
+      <li><a href="https://appbitacora.es/#home">Hoy</a><span class="n" data-n="hoy"></span></li>
       <li><a href="https://appbitacora.es/#calendar">Calendario</a></li>
-      <li><a href="https://appbitacora.es/#planner">Planificador</a></li>
+      <li><a href="https://appbitacora.es/#planner">Planificador</a><span class="n" data-n="planificador"></span></li>
       <li><a href="https://appbitacora.es/#habits">Rutinas</a></li>
       <li><a href="https://appbitacora.es/#events">Eventos</a></li>
       <li><a href="https://appbitacora.es/#notes">Notas</a></li>
     </ul>
   </nav>
 
-  <nav class="col c2" aria-labelledby="h-cuentas">
+  <nav class="col" aria-labelledby="h-cuentas">
     <h2 id="h-cuentas">Cuentas</h2>
     <ul>
-      <li><a href="https://appbitacora.es/#finances">Finanzas</a></li>
+      <li><a href="#finanzas" data-apartado="finanzas">Finanzas</a></li>
       <li><a href="https://appbitacora.es/#studies">Estudios</a></li>
       <li><a href="https://appbitacora.es/#estudiar">Repaso</a></li>
       <li><a href="https://appbitacora.es/#goals">Objetivos</a></li>
@@ -292,196 +72,72 @@ a:hover, a:focus-visible { text-decoration: underline; text-underline-offset: .2
     </ul>
   </nav>
 
-  <nav class="col c3" aria-labelledby="h-fuera">
+  <nav class="col" aria-labelledby="h-fuera">
     <h2 id="h-fuera">Fuera</h2>
     <ul>
       <li><a href="https://appbitacora.es/#culture">Ocio</a></li>
       <li><a href="https://appbitacora.es/#travels">Viajes</a></li>
       <li><a href="https://appbitacora.es/#compra">Despensa</a></li>
-      <li><a href="https://appbitacora.es/#settings">Ajustes</a></li>
+      <li><a href="https://appbitacora.es/#actualizaciones">Envíos</a><span class="n" data-n="envios"></span></li>
     </ul>
   </nav>
 
-  <section class="col c4" aria-labelledby="h-tono">
+  <section class="col" aria-labelledby="h-tono">
     <h2 id="h-tono">Tono</h2>
-    <p>Las dos tintas de esta edición: campo y papel.</p>
-    <div class="tono-caja">
-      <span id="tono-nombre">cobalto</span>
-      <button type="button" id="tono-siguiente" aria-label="Siguiente tono"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4"/></svg></button>
+    <div class="selector">
+      <label class="oculto" for="ed-tono">Tono</label>
+      <select id="ed-tono" class="ed-tono"></select>
+      <svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1.5 3.5 5 7l3.5-3.5"/></svg>
     </div>
   </section>
 </main>
 
-<nav class="legal" aria-label="Textos legales">
+<main class="pliego ajustes-pliego" id="ed-ajustes-pliego" hidden>
+  <section>
+    <p class="fecha">Ajustes de la edición</p>
+    <div class="acciones"><button type="button" class="enlace" id="ed-ajustes-volver">Volver al índice</button></div>
+  </section>
+  <section class="col" aria-labelledby="h-fondo">
+    <h2 id="h-fondo">Fondo</h2>
+    <ul id="ed-fondos"></ul>
+    <input type="file" id="ed-fondo-archivo" accept="image/*" hidden>
+    <p class="nota" id="ed-fondo-nota">Tu imagen se pasa a dos tintas y se funde arriba con el campo, para que el texto se lea.</p>
+  </section>
+  <section class="col" aria-labelledby="h-ajtono">
+    <h2 id="h-ajtono">Tono</h2>
+    <div class="selector">
+      <label class="oculto" for="ed-tono2">Tono</label>
+      <select id="ed-tono2" class="ed-tono"></select>
+      <svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1.5 3.5 5 7l3.5-3.5"/></svg>
+    </div>
+  </section>
+  <section class="col" aria-labelledby="h-ciudad">
+    <h2 id="h-ciudad">Ciudad del tiempo</h2>
+    <p id="ed-ciudad-actual"></p>
+    <label class="oculto" for="ed-ciudad-buscar">buscar ciudad</label>
+    <input class="casilla" id="ed-ciudad-buscar" type="search" placeholder="buscar ciudad" autocomplete="off">
+    <ul class="resultados" id="ed-ciudad-resultados"></ul>
+  </section>
+</main>
+
+<nav class="legal" id="ed-legal" aria-label="Textos legales">
   <a href="https://appbitacora.es/legal.html#privacidad">Privacidad</a>
   <a href="https://appbitacora.es/legal.html#condiciones">Condiciones</a>
   <a href="https://appbitacora.es/legal.html#aviso-legal">Aviso legal</a>
 </nav>
 
+<!-- APARTADOS -->
+<div class="lamina" id="ed-lamina" hidden>
+  <div class="lamina-marco">
+    <aside class="margen" id="ed-margen"></aside>
+    <main class="pagina" id="ed-pagina" tabindex="-1"></main>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
-<script>
-  // Los mismos datos públicos que usa appbitacora.es: es la misma cuenta, en otro dominio
-  var SUPABASE_URL = 'https://avdqtnukgbejorieuunj.supabase.co';
-  var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF2ZHF0bnVrZ2Jlam9yaWV1dW5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzMjcyOTUsImV4cCI6MjEwMDkwMzI5NX0.sq1cepXuBaNT6qygyxKEAhVHJh7G9LZyzaeJBhc7s7s';
-  var sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
-
-  var raiz = document.documentElement;
-  var acceso = document.getElementById('acceso');
-  var menu = document.getElementById('menu');
-  var error = document.getElementById('error');
-  var reducido = matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  var TONOS = ['cobalto', 'profundo', 'coral', 'registro', 'bosque', 'negativo'];
-  function pintarTono() {
-    document.getElementById('tono-nombre').textContent = raiz.getAttribute('data-tono');
-    document.querySelector('meta[name="theme-color"]').content = getComputedStyle(raiz).getPropertyValue('--tinta').trim();
-  }
-  document.getElementById('tono-siguiente').addEventListener('click', function () {
-    var t = TONOS[(TONOS.indexOf(raiz.getAttribute('data-tono')) + 1) % TONOS.length];
-    raiz.setAttribute('data-tono', t);
-    try { localStorage.setItem('editorial.tono', t); } catch (e) {}
-    pintarTono();
-  });
-  pintarTono();
-
-  function fechaLarga() {
-    var p = {};
-    new Intl.DateTimeFormat('es-ES', { timeZone: 'Europe/Madrid', weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })
-      .formatToParts(new Date()).forEach(function (x) { p[x.type] = x.value; });
-    return p.weekday + ' ' + p.day + ' de ' + p.month + ' de ' + p.year;
-  }
-  function hora() {
-    return new Intl.DateTimeFormat('es-ES', { timeZone: 'Europe/Madrid', hour: '2-digit', minute: '2-digit' }).format(new Date());
-  }
-
-  // Tres modos sobre las mismas casillas: entrar, crear cuenta y recuperar contraseña
-  var modo = 'entrar';
-  var ENLACES = {
-    entrar: [['crear', 'crear cuenta'], ['recuperar', 'recuperar contraseña']],
-    crear: [['entrar', 'ya tengo cuenta']],
-    recuperar: [['entrar', 'volver a entrar']]
-  };
-  var campoUsuario = document.getElementById('usuario');
-  var campoClave = document.getElementById('clave');
-  var campoClave2 = document.getElementById('clave2');
-  var aviso = document.getElementById('aviso');
-  var otros = document.getElementById('otros');
-
-  function pintarModo(m) {
-    modo = m;
-    campoClave.hidden = m === 'recuperar';
-    campoClave2.hidden = m !== 'crear';
-    campoClave.autocomplete = m === 'crear' ? 'new-password' : 'current-password';
-    campoClave.value = ''; campoClave2.value = '';
-    error.textContent = ''; aviso.textContent = '';
-    otros.innerHTML = '';
-    ENLACES[m].forEach(function (e, i) {
-      if (i) { var s = document.createElement('span'); s.className = 'sep'; s.textContent = '/'; otros.appendChild(s); }
-      var b = document.createElement('button'); b.type = 'button'; b.textContent = e[1];
-      b.addEventListener('click', function () { cambiarModo(e[0]); });
-      otros.appendChild(b);
-    });
-  }
-  function cambiarModo(m) {
-    if (reducido) { pintarModo(m); campoUsuario.focus(); return; }
-    acceso.classList.add('cambiando');
-    setTimeout(function () {
-      pintarModo(m);
-      acceso.classList.remove('cambiando');
-      (campoUsuario.value ? (m === 'recuperar' ? campoUsuario : campoClave) : campoUsuario).focus();
-    }, 160);
-  }
-
-  function verAcceso() {
-    menu.hidden = true; menu.classList.remove('visible');
-    acceso.hidden = false; acceso.classList.remove('saliendo', 'enviando');
-    pintarModo('entrar');
-    campoUsuario.focus();
-  }
-
-  // La misma comprobación que el alta de appbitacora.es (revisarContrasena en nucleo.js)
-  async function revisarContrasena(clave) {
-    if (clave.length < 8) return 'La contraseña debe tener al menos 8 caracteres.';
-    if (/^(.)\1+$/.test(clave) || /^(12345678|password|contraseña|qwertyui)/i.test(clave)) return 'Esa contraseña es demasiado fácil de adivinar.';
-    try {
-      var h = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-1', new TextEncoder().encode(clave)))).map(function (b) { return b.toString(16).padStart(2, '0'); }).join('').toUpperCase();
-      var r = await Promise.race([fetch('https://api.pwnedpasswords.com/range/' + h.slice(0, 5)), new Promise(function (_, mal) { setTimeout(function () { mal(new Error('sin respuesta')); }, 4000); })]);
-      if (r.ok && (await r.text()).split(/\r?\n/).some(function (l) { return l.indexOf(h.slice(5) + ':') === 0; })) return 'Esa contraseña ha aparecido en filtraciones de otras webs. Elige otra.';
-    } catch (e) {}
-    return '';
-  }
-  // Las casillas se desvanecen y el menú brota columna a columna, de izquierda a derecha
-  function verMenu(usuario, conTransicion) {
-    document.getElementById('fecha').textContent = fechaLarga();
-    document.getElementById('correo').textContent = usuario.email || '';
-    document.getElementById('lugar').textContent = 'Madrid, ' + hora();
-    var mostrar = function () {
-      acceso.hidden = true;
-      menu.hidden = false;
-      requestAnimationFrame(function () { requestAnimationFrame(function () {
-        menu.classList.add('visible');
-        setTimeout(function () { document.getElementById('firma').focus({ preventScroll: true }); }, reducido ? 100 : 420);
-      }); });
-    };
-    if (!conTransicion) return mostrar();
-    acceso.classList.add('saliendo');
-    setTimeout(mostrar, reducido ? 100 : 240);
-  }
-  setInterval(function () { if (!menu.hidden) document.getElementById('lugar').textContent = 'Madrid, ' + hora(); }, 30000);
-
-  function mensajeError(e) {
-    var m = (e && e.message || '').toLowerCase();
-    if (m.indexOf('invalid login') >= 0 || m.indexOf('invalid credentials') >= 0) return 'Usuario o contraseña incorrectos.';
-    if (m.indexOf('email not confirmed') >= 0) return 'Falta confirmar el correo de esta cuenta.';
-    if (m.indexOf('fetch') >= 0 || m.indexOf('network') >= 0) return 'Sin conexión con Bitácora. Prueba de nuevo.';
-    return 'No se ha podido entrar. Prueba de nuevo.';
-  }
-
-  acceso.addEventListener('submit', async function (ev) {
-    ev.preventDefault();
-    if (acceso.classList.contains('enviando')) return;
-    var correo = campoUsuario.value.trim();
-    var clave = campoClave.value;
-    if (!correo) { campoUsuario.focus(); return; }
-    if (modo !== 'recuperar' && !clave) { campoClave.focus(); return; }
-    if (modo === 'crear' && !campoClave2.value) { campoClave2.focus(); return; }
-    if (!sb) { error.textContent = 'Sin conexión con Bitácora. Prueba de nuevo.'; return; }
-    error.textContent = ''; aviso.textContent = '';
-    acceso.classList.add('enviando');
-    try {
-      if (modo === 'entrar') {
-        var r = await sb.auth.signInWithPassword({ email: correo, password: clave });
-        if (r.error) { error.textContent = mensajeError(r.error); campoClave.select(); return; }
-        verMenu(r.data.user, true);
-      } else if (modo === 'crear') {
-        var fallo = await revisarContrasena(clave);
-        if (!fallo && clave !== campoClave2.value) fallo = 'Las contraseñas no coinciden.';
-        if (fallo) { error.textContent = fallo; campoClave.focus(); return; }
-        var a = await sb.auth.signUp({ email: correo, password: clave });
-        if (a.error) { error.textContent = 'No se ha podido crear la cuenta: ' + a.error.message; return; }
-        if (a.data.session) { verMenu(a.data.user, true); return; }
-        campoClave.value = ''; campoClave2.value = '';
-        aviso.textContent = 'Cuenta creada. Confírmala desde el correo que te hemos enviado y vuelve a entrar.';
-      } else {
-        // El enlace del correo abre appbitacora.es, que ya sabe poner la contraseña nueva
-        var p = await sb.auth.resetPasswordForEmail(correo, { redirectTo: 'https://appbitacora.es/' });
-        if (p.error) { error.textContent = 'No se ha podido enviar el enlace: ' + p.error.message; return; }
-        aviso.textContent = 'Si la cuenta existe, te hemos enviado un enlace para elegir otra contraseña.';
-      }
-    } finally {
-      acceso.classList.remove('enviando');
-    }
-  });
-
-  document.getElementById('salir').addEventListener('click', async function () {
-    if (sb) await sb.auth.signOut();
-    verAcceso();
-  });
-
-  (async function () {
-    var s = sb ? (await sb.auth.getSession()).data.session : null;
-    if (s) verMenu(s.user, false); else verAcceso();
-  })();
-</script>
+<script src="js/logica.js?v=9"></script>
+<script src="js/fondo.js?v=9"></script>
+<script src="js/finanzas.js?v=9"></script>
+<script src="js/portada.js?v=9"></script>
 </body>
 </html>
