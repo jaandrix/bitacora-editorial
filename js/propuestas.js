@@ -2,6 +2,7 @@
 // se ha aplicado, venga de apuntar o del conector, con deshacer. Usa la bandeja de la app normal (conector.js):
 // aplicarBandejaConector, validarBandeja, descartarBandeja y deshacerConector.
 window.ED = window.ED || {};
+window.ED.apartados = window.ED.apartados || {};
 (function (ED) {
   var POR_PAGINA = 20;
   var ORIGEN = { apuntar: 'De apuntar', auto: 'De conector', validado: 'De conector, validado', descartado: 'Descartado' };

@@ -2,6 +2,7 @@
 // suscripciones.js): los saldos, la serie diaria, el saldo tras cada movimiento, lo que no es ni ingreso ni gasto
 // (ahorros, ajustes, inversión) y las casillas del presupuesto. Aquí solo se compone la página.
 window.ED = window.ED || {};
+window.ED.apartados = window.ED.apartados || {};
 (function (ED) {
   var POR_PAGINA = 20;
   var MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];

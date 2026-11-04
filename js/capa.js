@@ -3,6 +3,7 @@
 // interpretarApunte, apuntarTipo, apuntarCrear) y deja cada cosa en «lo que has apuntado» y en el historial del
 // conector, con deshacer. Además sabe borrar movimientos: «borra el gasto de 12 en gasolina».
 window.ED = window.ED || {};
+window.ED.apartados = window.ED.apartados || {};
 (function (ED) {
   var $ = function (id) { return document.getElementById(id); };
   var capa = $('ed-capa'), caja = $('ed-capa-texto'), pista = $('ed-capa-pista'), lista = $('ed-capa-lista');

@@ -1,5 +1,6 @@
 // Portada, ajustes y paso entre la portada y los apartados.
 window.ED = window.ED || {};
+window.ED.apartados = window.ED.apartados || {};
 (function (ED) {
   var $ = function (id) { return document.getElementById(id); };
   var raiz = document.documentElement;

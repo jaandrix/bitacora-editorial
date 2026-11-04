@@ -1,6 +1,7 @@
 // Fondos de la portada. Todos son máscaras: lo claro de la imagen se pinta con el papel del tono y lo oscuro deja ver
 // el campo. Así cualquier foto queda a dos tintas, del mismo modo que el grabado de serie.
 window.ED = window.ED || {};
+window.ED.apartados = window.ED.apartados || {};
 (function (ED) {
   ED.FONDOS_SERIE = [
     { id: 'jinete', nombre: 'Jinete', url: 'img/paisaje.webp', pos: 'center bottom' }
