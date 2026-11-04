@@ -38,6 +38,10 @@ window.ED.apartados = window.ED.apartados || {};
     window.contarApartado = function () {};
     window.render = function () { if (ED.repintar) ED.repintar(); };
     window.renderMobileShell = function () {};
+    window.showToast = function (texto, esError) { if (ED.aviso) ED.aviso(texto, esError); };
+    window.closeModal = function () {};
+    window.renderAllNavs = function () {};
+    window.refrescarBandeja = function () { if (ED.repintar) ED.repintar(); };
   }
 
   ED.logica = (async function () {

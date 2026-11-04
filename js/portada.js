@@ -106,10 +106,11 @@ window.ED = window.ED || {};
 
   function verAcceso() {
     usuario = null;
+    document.body.classList.remove('en-lamina');
     ED.vista = 'acceso';
     ponerTono('cobalto');
     ED.ponerFondoInicial();
-    [$('ed-menu'), $('ed-ajustes-pliego'), $('ed-firma'), $('ed-ajustes'), $('ed-lamina')].forEach(function (el) { el.hidden = true; });
+    [$('ed-menu'), $('ed-ajustes-pliego'), $('ed-firma'), $('ed-esquina'), $('ed-lamina')].forEach(function (el) { el.hidden = true; });
     $('ed-menu').classList.remove('visible');
     $('ed-legal').hidden = false;
     acceso.hidden = false; acceso.classList.remove('saliendo', 'cargando');
@@ -165,7 +166,7 @@ window.ED = window.ED || {};
 
     try { $('ed-saldo').textContent = financeMoney(financeProTotalBalance()); } catch (e) { $('ed-saldo').textContent = ''; }
 
-    var n = { hoy: delDia.length, planificador: tareas.length, envios: enCamino.length };
+    var n = { hoy: delDia.length, planificador: tareas.length, envios: enCamino.length, propuestas: ED.numPropuestas ? ED.numPropuestas() : 0 };
     document.querySelectorAll('[data-n]').forEach(function (el) { var v = n[el.dataset.n]; el.textContent = v ? '(' + v + ')' : ''; });
     pintarTiempo();
   }
@@ -189,7 +190,7 @@ window.ED = window.ED || {};
 
   // ---------- Menú ----------
   function mostrarPortada() {
-    $('ed-firma').hidden = false; $('ed-ajustes').hidden = false; $('ed-legal').hidden = false;
+    $('ed-firma').hidden = false; $('ed-esquina').hidden = false; $('ed-legal').hidden = false;
     $('ed-paisaje').style.opacity = '';
   }
   async function verMenu(conTransicion) {
@@ -197,6 +198,7 @@ window.ED = window.ED || {};
     guardarLocal('ultimo', null);
     ponerTono(raiz.getAttribute('data-tono'));
     pintarDatos();
+    if (ED.leerPropuestas) ED.leerPropuestas();
     var menu = $('ed-menu');
     $('ed-ajustes-pliego').hidden = true; $('ed-ajustes').setAttribute('aria-pressed', 'false');
     if (conTransicion && !acceso.hidden) { acceso.classList.add('saliendo'); await espera(240); }
@@ -207,6 +209,7 @@ window.ED = window.ED || {};
     requestAnimationFrame(function () { requestAnimationFrame(function () { menu.classList.add('visible'); }); });
   }
   ED.verMenu = verMenu;
+  ED.verAjustes = function () { if (ED.vista === 'menu') verAjustes(); };
 
   async function entrar(u, conTransicion) {
     usuario = u;
@@ -224,6 +227,17 @@ window.ED = window.ED || {};
     }
     await verMenu(conTransicion);
   }
+
+  // Avisos impresos en la propia página, abajo, que se van solos (sustituyen al showToast de la app normal)
+  var avisoTemporizador = null;
+  ED.aviso = function (texto, esError) {
+    var el = $('ed-nota');
+    el.textContent = String(texto || '').replace(/\.$/, '') + '.';
+    el.classList.toggle('error-linea', !!esError);
+    el.classList.add('visible');
+    clearTimeout(avisoTemporizador);
+    avisoTemporizador = setTimeout(function () { el.classList.remove('visible'); }, esError ? 7000 : 4000);
+  };
 
   ED.repintar = function () {
     if (ED.vista === 'menu') pintarDatos();
@@ -318,6 +332,7 @@ window.ED = window.ED || {};
     verMenu(false);
   }
   $('ed-ajustes').addEventListener('click', verAjustes);
+  $('ed-apuntar-btn').addEventListener('click', function () { ED.abrirApuntar(); });
   $('ed-ajustes-volver').addEventListener('click', volverDeAjustes);
 
   // ---------- Apartados ----------
@@ -327,6 +342,7 @@ window.ED = window.ED || {};
     return '' +
       '<button type="button" class="enlace firma" data-accion="indice" title="Volver al índice">Bitácora Editorial</button>' +
       '<button type="button" class="enlace indice" data-accion="indice"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M6.5 1.5 3 5l3.5 3.5"/></svg>Índice</button>' +
+      '<button type="button" class="apuntar-margen" data-accion="apuntar">+ Apuntar <span>(espacio)</span></button>' +
       '<hr>' +
       '<p class="rot">' + esc(ap.nombre) + '</p>' +
       '<ul class="pestanas">' + ap.pestanas.map(function (p) {
@@ -364,10 +380,12 @@ window.ED = window.ED || {};
     lam.classList.toggle('plegada', !!leerLocal('plegada'));
     pintarApartado();
     lam.hidden = false;
+    document.body.classList.add('en-lamina');
+    if (ap.alAbrir) ap.alAbrir(estado[id]);
     ponerTono(raiz.getAttribute('data-tono'));
     requestAnimationFrame(function () { requestAnimationFrame(function () {
       lam.classList.add('visible');
-      setTimeout(function () { ['ed-firma', 'ed-ajustes', 'ed-legal'].forEach(function (i) { $(i).hidden = true; }); $('ed-pagina').focus({ preventScroll: true }); }, reducido ? 100 : 220);
+      setTimeout(function () { ['ed-firma', 'ed-esquina', 'ed-legal'].forEach(function (i) { $(i).hidden = true; }); $('ed-pagina').focus({ preventScroll: true }); }, reducido ? 100 : 220);
     }); });
   }
   ED.abrirApartado = abrirApartado;
@@ -379,6 +397,7 @@ window.ED = window.ED || {};
     lam.classList.remove('visible');
     await espera(180);
     lam.hidden = true;
+    document.body.classList.remove('en-lamina');
     var menu = $('ed-menu');
     menu.classList.add('directo');
     await verMenu(false);
@@ -389,6 +408,7 @@ window.ED = window.ED || {};
   $('ed-margen').addEventListener('click', function (ev) {
     var a = ev.target.closest('[data-accion]'), p = ev.target.closest('[data-pestana]');
     if (a && a.dataset.accion === 'indice') return volverAlIndice();
+    if (a && a.dataset.accion === 'apuntar') return ED.abrirApuntar();
     if (a && a.dataset.accion === 'plegar') {
       var lam = $('ed-lamina'); lam.classList.toggle('plegada');
       guardarLocal('plegada', lam.classList.contains('plegada'));
@@ -433,7 +453,11 @@ window.ED = window.ED || {};
       else if (ED.vista === 'ajustes') { ev.preventDefault(); volverDeAjustes(); }
       return;
     }
-    if (enCampo) return;
+    if (enCampo || ED.capaAbierta()) return;
+    if (ED.vista !== 'acceso' && !ev.ctrlKey && !ev.metaKey && !ev.altKey) {
+      if (ev.key === ' ' && ED.vista !== 'ajustes') { ev.preventDefault(); return ED.abrirApuntar(); }
+      if (ev.key === 'Enter' && !(document.activeElement && /^(BUTTON|A)$/.test(document.activeElement.tagName))) { ev.preventDefault(); return ED.abrirIr(); }
+    }
     var ap = ED.apartados[ED.vista];
     if (ap && ap.tecla && ap.tecla(ev, estado[ED.vista])) ev.preventDefault();
   });
@@ -454,3 +478,8 @@ window.ED = window.ED || {};
     verAcceso();
   })();
 })(window.ED);
+
+// Sin conexión: el service worker guarda la página y la lógica de Bitácora (los datos los guarda loadData)
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+  window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+}

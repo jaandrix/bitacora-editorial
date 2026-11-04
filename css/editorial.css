@@ -330,3 +330,68 @@ a:hover, a:focus-visible, .enlace:hover, .enlace:focus-visible { text-decoration
 
 .boton { white-space: nowrap; }
 .botones { flex-wrap: wrap; }
+
+/* ============ ESQUINA: estado de la nube, apuntar y ajustes ============ */
+.esquina { position: fixed; top: calc(26 * var(--u)); right: var(--margen-x); display: flex; align-items: center; gap: calc(8 * var(--u)); transition: opacity 160ms ease; }
+.esquina .boton-esquina { position: static; }
+.estado-sync { font: italic max(11px, calc(11 * var(--u))) / 1 var(--serif); opacity: .8; margin-right: calc(6 * var(--u)); }
+.estado-sync:empty { display: none; }
+
+/* ============ CAPA: apuntar e ir ============ */
+.capa { position: fixed; inset: 0; z-index: 30; color: var(--papel); opacity: 0; transition: opacity 180ms ease-out; }
+.capa.visible { opacity: 1; }
+.capa-caja { position: absolute; top: calc(118 * var(--u)); left: 0; right: 0; margin-inline: auto; width: min(calc(100vw - 32px), max(320px, calc(440 * var(--u)))); }
+.capa .casilla { color: inherit; border-color: color-mix(in srgb, currentColor 82%, transparent); height: max(34px, calc(32 * var(--u))); font-size: max(13.5px, calc(13 * var(--u))); }
+.capa .casilla::placeholder { color: inherit; }
+.capa .casilla:-webkit-autofill { -webkit-text-fill-color: currentColor; }
+.capa-pista { margin: calc(8 * var(--u)) 0 0; font: italic max(11.5px, calc(11.5 * var(--u))) / 1.45 var(--serif); opacity: .7; }
+.capa-pista.error-linea { opacity: 1; padding-top: 6px; border-top: 1px solid var(--coral); }
+.capa-lista { list-style: none; margin: calc(14 * var(--u)) 0 0; padding: 0; font-size: max(13px, calc(13 * var(--u))); }
+.capa-lista li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px calc(12 * var(--u)); padding: calc(7 * var(--u)) 0; border-top: 1px solid color-mix(in srgb, currentColor 30%, transparent); }
+.capa-lista li:last-child { border-bottom: 1px solid color-mix(in srgb, currentColor 30%, transparent); }
+.capa-lista .rot, .tipo-apunte select { font-size: max(9.5px, calc(9.5 * var(--u))); letter-spacing: .14em; text-transform: uppercase; }
+.capa-lista .rot { margin: 0; min-width: calc(80 * var(--u)); }
+.tipo-apunte select { appearance: none; -webkit-appearance: none; background: none; border: 0; border-bottom: 1px solid color-mix(in srgb, currentColor 45%, transparent); color: inherit; font-family: var(--serif); padding: 0 0 2px; cursor: pointer; min-width: calc(80 * var(--u)); border-radius: 0; }
+.tipo-apunte option { color: #171713; background: #E8DDBD; text-transform: none; letter-spacing: 0; }
+.capa-lista .resumen { flex: 1; min-width: 0; }
+.capa-lista .falta { flex-basis: 100%; padding-left: calc(92 * var(--u)); font-style: italic; color: var(--coral); }
+.capa-lista .destino { cursor: pointer; }
+.capa-lista .destino small { font-style: italic; opacity: .6; }
+.capa-lista .destino.elegido .resumen, .capa-lista .destino:hover .resumen { text-decoration: underline; text-underline-offset: .22em; text-decoration-thickness: 1px; }
+/* Lo de debajo se funde con su fondo mientras la capa está abierta */
+.pliego, .firma-portada, .legal, .lamina .margen, .lamina .pagina { transition: opacity 180ms ease-out; }
+body.con-capa .pliego, body.con-capa .firma-portada, body.con-capa .esquina, body.con-capa .legal,
+body.con-capa .lamina .margen, body.con-capa .lamina .pagina { opacity: 0 !important; pointer-events: none; }
+body.capa-en-lamina .capa { color: var(--tinta-int); }
+body.capa-en-lamina .capa .falta, body.capa-en-lamina .capa-pista.error-linea { color: #9A4436; border-color: #B85F50; }
+
+/* Botón de apuntar en el margen de los apartados */
+.apuntar-margen { margin-top: calc(10 * var(--u)); align-self: flex-start; background: none; color: inherit; cursor: pointer; border: 1px solid color-mix(in srgb, currentColor 60%, transparent); border-radius: 0; height: max(23px, calc(23 * var(--u))); padding: 0 calc(9 * var(--u)); font: max(9.5px, calc(9.5 * var(--u))) / 1 var(--serif); letter-spacing: .14em; text-transform: uppercase; transition: background-color 140ms ease, color 140ms ease; }
+.apuntar-margen span { text-transform: none; letter-spacing: 0; font-style: italic; opacity: .7; }
+.apuntar-margen:hover, .apuntar-margen:focus-visible { background: var(--margen-texto); color: var(--margen); outline: none; }
+
+/* Aviso impreso abajo, que se va solo */
+.nota-ed { position: fixed; left: 0; right: 0; bottom: calc(40 * var(--u)); z-index: 40; margin: 0; text-align: center; pointer-events: none;
+  font: italic max(12.5px, calc(12.5 * var(--u))) / 1.4 var(--serif); color: var(--tinta);
+  text-shadow: 0 0 2px var(--papel), 0 0 5px var(--papel), 0 0 12px var(--papel);
+  opacity: 0; transform: translateY(4px); transition: opacity 200ms ease-out, transform 200ms ease-out; }
+.nota-ed.visible { opacity: 1; transform: none; }
+.nota-ed.error-linea { color: #9A4436; }
+body.en-lamina .nota-ed { color: var(--tinta-int); text-shadow: none; bottom: calc(30 * var(--u)); }
+
+/* Propuestas */
+.tabla .acc-t { width: 17%; text-align: right; }
+.tabla tr.deshecho td { opacity: .5; }
+
+@media (max-width: 760px) {
+  .esquina { position: absolute; top: calc(18px + env(safe-area-inset-top)); right: 16px; }
+  .esquina .estado-sync { display: none; }
+  .capa-caja { top: 22vh; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .capa, .nota-ed { transition: opacity 100ms linear; transform: none; }
+}
+@media (max-width: 760px) {
+  .esquina { top: calc(56px + env(safe-area-inset-top)); left: 16px; right: auto; }
+  .pliego { padding-top: calc(104px + env(safe-area-inset-top)); }
+}

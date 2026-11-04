@@ -7,11 +7,15 @@
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#104A93">
 <link rel="icon" href="favicon-32.png">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="img/icono-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Editorial">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;1,8..60,400&display=swap" rel="stylesheet">
 <link rel="preload" as="image" href="img/paisaje.webp" type="image/webp">
-<link rel="stylesheet" href="css/editorial.css?v=10">
+<link rel="stylesheet" href="css/editorial.css?v=15">
 </head>
 <body>
 <div class="paisaje" id="ed-paisaje" aria-hidden="true"></div>
@@ -19,7 +23,11 @@
 
 <!-- PORTADA -->
 <p class="firma-portada" id="ed-firma" hidden>Bitácora Editorial</p>
-<button class="boton-esquina" id="ed-ajustes" type="button" aria-pressed="false" hidden>Ajustes</button>
+<div class="esquina" id="ed-esquina" hidden>
+  <span class="estado-sync" role="status"></span>
+  <button class="boton-esquina" id="ed-apuntar-btn" type="button" title="Apuntar (espacio)">+ Apuntar</button>
+  <button class="boton-esquina" id="ed-ajustes" type="button" aria-pressed="false">Ajustes</button>
+</div>
 
 <form class="acceso" id="ed-acceso" hidden novalidate>
   <label class="oculto" for="ed-usuario">usuario</label>
@@ -69,6 +77,7 @@
       <li><a href="https://appbitacora.es/#estudiar">Repaso</a></li>
       <li><a href="https://appbitacora.es/#goals">Objetivos</a></li>
       <li><a href="https://appbitacora.es/#projects">Proyectos</a></li>
+      <li><a href="#propuestas" data-apartado="propuestas">Propuestas</a><span class="n" data-n="propuestas"></span></li>
     </ul>
   </nav>
 
@@ -126,6 +135,17 @@
   <a href="https://appbitacora.es/legal.html#aviso-legal">Aviso legal</a>
 </nav>
 
+<!-- APUNTAR E IR: una casilla sobre la página fundida -->
+<div class="capa" id="ed-capa" hidden>
+  <div class="capa-caja">
+    <label class="oculto" for="ed-capa-texto">Escribe</label>
+    <input class="casilla capa-casilla" id="ed-capa-texto" type="text" autocomplete="off" spellcheck="true">
+    <p class="capa-pista" id="ed-capa-pista"></p>
+    <ul class="capa-lista" id="ed-capa-lista"></ul>
+  </div>
+</div>
+<p class="nota-ed" id="ed-nota" role="status" aria-live="polite"></p>
+
 <!-- APARTADOS -->
 <div class="lamina" id="ed-lamina" hidden>
   <div class="lamina-marco">
@@ -135,9 +155,11 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
-<script src="js/logica.js?v=10"></script>
-<script src="js/fondo.js?v=10"></script>
-<script src="js/finanzas.js?v=10"></script>
-<script src="js/portada.js?v=10"></script>
+<script src="js/logica.js?v=15"></script>
+<script src="js/fondo.js?v=15"></script>
+<script src="js/capa.js?v=15"></script>
+<script src="js/propuestas.js?v=15"></script>
+<script src="js/finanzas.js?v=15"></script>
+<script src="js/portada.js?v=15"></script>
 </body>
 </html>
