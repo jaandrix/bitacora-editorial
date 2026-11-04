@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;1,8..60,400&display=swap" rel="stylesheet">
 <link rel="preload" as="image" href="img/paisaje.webp" type="image/webp">
-<link rel="stylesheet" href="css/editorial.css?v=21">
+<link rel="stylesheet" href="css/editorial.css?v=24">
 </head>
 <body>
 <div class="paisaje" id="ed-paisaje" aria-hidden="true"></div>
@@ -59,12 +59,12 @@
   <nav class="col" aria-labelledby="h-agenda">
     <h2 id="h-agenda">Agenda</h2>
     <ul>
-      <li><a href="https://appbitacora.es/#home">Hoy</a><span class="n" data-n="hoy"></span></li>
-      <li><a href="https://appbitacora.es/#calendar">Calendario</a></li>
-      <li><a href="https://appbitacora.es/#planner">Planificador</a><span class="n" data-n="planificador"></span></li>
-      <li><a href="https://appbitacora.es/#habits">Rutinas</a></li>
-      <li><a href="https://appbitacora.es/#events">Eventos</a></li>
-      <li><a href="https://appbitacora.es/#notes">Notas</a></li>
+      <li><a href="#hoy" data-apartado="hoy">Hoy</a><span class="n" data-n="hoy"></span></li>
+      <li><a href="#calendario" data-apartado="calendario">Calendario</a></li>
+      <li><a href="#planificador" data-apartado="planificador">Planificador</a><span class="n" data-n="planificador"></span></li>
+      <li><a href="#rutinas" data-apartado="rutinas">Rutinas</a></li>
+      <li><a href="#eventos" data-apartado="eventos">Eventos</a></li>
+      <li><a href="#notas" data-apartado="notas">Notas</a></li>
     </ul>
   </nav>
 
@@ -72,10 +72,10 @@
     <h2 id="h-cuentas">Cuentas</h2>
     <ul>
       <li><a href="#finanzas" data-apartado="finanzas">Finanzas</a></li>
-      <li><a href="https://appbitacora.es/#studies">Estudios</a></li>
+      <li><a href="#estudios" data-apartado="estudios">Estudios</a></li>
       <li><a href="https://appbitacora.es/#estudiar">Repaso</a></li>
-      <li><a href="https://appbitacora.es/#goals">Objetivos</a></li>
-      <li><a href="https://appbitacora.es/#projects">Proyectos</a></li>
+      <li><a href="#objetivos" data-apartado="objetivos">Objetivos</a></li>
+      <li><a href="#proyectos" data-apartado="proyectos">Proyectos</a></li>
       <li><a href="#propuestas" data-apartado="propuestas">Propuestas</a><span class="n" data-n="propuestas"></span></li>
     </ul>
   </nav>
@@ -83,10 +83,10 @@
   <nav class="col" aria-labelledby="h-fuera">
     <h2 id="h-fuera">Fuera</h2>
     <ul>
-      <li><a href="https://appbitacora.es/#culture">Ocio</a></li>
-      <li><a href="https://appbitacora.es/#travels">Viajes</a></li>
-      <li><a href="https://appbitacora.es/#compra">Despensa</a></li>
-      <li><a href="https://appbitacora.es/#actualizaciones">Envíos</a><span class="n" data-n="envios"></span></li>
+      <li><a href="#ocio" data-apartado="ocio">Ocio</a></li>
+      <li><a href="#viajes" data-apartado="viajes">Viajes</a></li>
+      <li><a href="#despensa" data-apartado="despensa">Despensa</a></li>
+      <li><a href="#envios" data-apartado="envios">Envíos</a><span class="n" data-n="envios"></span></li>
     </ul>
   </nav>
 
@@ -146,11 +146,12 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
-<script src="js/logica.js?v=21"></script>
-<script src="js/fondo.js?v=21"></script>
-<script src="js/capa.js?v=21"></script>
-<script src="js/propuestas.js?v=21"></script>
-<script src="js/finanzas.js?v=21"></script>
-<script src="js/portada.js?v=21"></script>
+<script src="js/logica.js?v=24"></script>
+<script src="js/fondo.js?v=24"></script>
+<script src="js/capa.js?v=24"></script>
+<script src="js/propuestas.js?v=24"></script>
+<script src="js/apartados.js?v=24"></script>
+<script src="js/finanzas.js?v=24"></script>
+<script src="js/portada.js?v=24"></script>
 </body>
 </html>

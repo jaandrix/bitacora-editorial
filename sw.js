@@ -1,12 +1,12 @@
 // Service worker de Bitácora Editorial: guarda la página, la lógica de Bitácora que carga desde appbitacora.es, la
 // librería de Supabase y las fuentes, para abrirla sin conexión. Los datos sin conexión ya los lleva loadData con su
 // copia en IndexedDB. Al cambiar algún archivo propio, subir VERSION (la misma ?v= de index.html).
-const VERSION = '21';
+const VERSION = '24';
 const CASCARON = 'editorial-' + VERSION;
 const COPIAS = 'editorial-copias';
 const PROPIOS = ['./', 'index.html', 'manifest.json', 'favicon-32.png', 'img/paisaje.webp', 'img/icono-192.png',
   'css/editorial.css?v=' + VERSION, 'js/logica.js?v=' + VERSION, 'js/fondo.js?v=' + VERSION, 'js/capa.js?v=' + VERSION,
-  'js/propuestas.js?v=' + VERSION, 'js/finanzas.js?v=' + VERSION, 'js/portada.js?v=' + VERSION];
+  'js/propuestas.js?v=' + VERSION, 'js/apartados.js?v=' + VERSION, 'js/finanzas.js?v=' + VERSION, 'js/portada.js?v=' + VERSION];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CASCARON).then(c => Promise.all(PROPIOS.map(u => c.add(u).catch(() => {})))).then(() => self.skipWaiting()));

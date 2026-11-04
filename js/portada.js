@@ -370,6 +370,18 @@ window.ED.apartados = window.ED.apartados || {};
   async function abrirApartado(id, pestana, conTransicion) {
     var ap = ED.apartados[id]; if (!ap) return;
     estado[id] = Object.assign({ pestana: ap.pestanas[0].id, pagina: 0, buscar: '' }, estado[id] || {}, pestana ? { pestana: pestana } : {});
+    // De un apartado a otro (con Intro) no se vuelve a pasar por la portada: solo cambia el cuerpo de la lámina
+    if (ED.apartados[ED.vista] && !$('ed-lamina').hidden) {
+      var pag = $('ed-pagina');
+      pag.classList.add('cambiando'); await espera(120);
+      ED.vista = id;
+      guardarLocal('ultimo', { apartado: id, pestana: estado[id].pestana });
+      pintarApartado();
+      if (ap.alAbrir) ap.alAbrir(estado[id]);
+      pag.classList.remove('cambiando');
+      pag.focus({ preventScroll: true });
+      return;
+    }
     var menu = $('ed-menu');
     if (conTransicion !== false && !menu.hidden) { menu.classList.add('saliendo'); await espera(140); }
     menu.hidden = true; menu.classList.remove('visible', 'saliendo');

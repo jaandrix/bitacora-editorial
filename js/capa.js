@@ -106,7 +106,7 @@ window.ED.apartados = window.ED.apartados || {};
   }
 
   // ---------- ¿Dónde quieres ir? ----------
-  var EDITORIAL = { finances: 'finanzas', bandeja: 'propuestas' };
+  var EDITORIAL = { finances: 'finanzas', bandeja: 'propuestas', home: 'hoy', calendar: 'calendario', planner: 'planificador', habits: 'rutinas', events: 'eventos', notes: 'notas', studies: 'estudios', goals: 'objetivos', projects: 'proyectos', culture: 'ocio', travels: 'viajes', compra: 'despensa', actualizaciones: 'envios' };
   function todosLosDestinos() {
     var out = [];
     try {
