@@ -419,34 +419,135 @@ window.ED.apartados = window.ED.apartados || {};
   });
 
   // ---------- Ocio: portadas pequeñas en negro, con el título arriba y la imagen debajo ----------
+  // Cada obra se abre en su ficha dentro de la misma lámina. Terminar y valorar pasan por la op entrada_editar del
+  // conector, así quedan en el historial de Propuestas con su deshacer.
   var OCIO = {
-    libros: { tipo: 'book', nombre: 'Libros', grupos: [['Leyendo', 'Leyendo'], ['Completado', 'Leídos'], ['Abandonado', 'Abandonados']] },
-    series: { tipo: 'series', nombre: 'Series', grupos: [['Viendo', 'Viendo'], ['Completada', 'Vistas'], ['Abandonada', 'Abandonadas']] },
-    pelis: { tipo: 'movie', nombre: 'Películas', grupos: [['_todas', 'Vistas']] },
-    juegos: { tipo: 'game', nombre: 'Videojuegos', grupos: [['Jugando', 'Jugando'], ['Completado', 'Terminados'], ['Abandonado', 'Abandonados']] }
+    libros: { tipo: 'book', nombre: 'Libros', palabra: 'libro', curso: 'Leyendo', fin: 'Completado', grupos: [['Leyendo', 'Leyendo'], ['Completado', 'Leídos'], ['Abandonado', 'Abandonados']] },
+    series: { tipo: 'series', nombre: 'Series', palabra: 'serie', curso: 'Viendo', fin: 'Completada', grupos: [['Viendo', 'Viendo'], ['Completada', 'Vistas'], ['Abandonada', 'Abandonadas']] },
+    pelis: { tipo: 'movie', nombre: 'Películas', palabra: 'peli', grupos: [['_todas', 'Vistas']] },
+    juegos: { tipo: 'game', nombre: 'Videojuegos', palabra: 'juego', curso: 'Jugando', fin: 'Completado', grupos: [['Jugando', 'Jugando'], ['Completado', 'Terminados'], ['Abandonado', 'Abandonados']] }
   };
+  var TIPO_A_PESTANA = { book: 'libros', series: 'series', movie: 'pelis', game: 'juegos' };
   function estadoOcio(x) { if (x.type === 'series' && x.endDate && x.status === 'Viendo') return 'Completada'; return x.status || ''; }
-  function portada(x) {
-    var fecha = x.endDate || x.date || x.startDate || '';
-    var estrellas = Number(x.rating) ? ', ' + Number(x.rating) + '/5' : '';
-    return '<figure class="portada">' +
-      '<figcaption><span class="t">' + esc(x.title || '') + '</span><span class="m">' + esc(fecha ? fCorta(fecha) : '') + esc(estrellas) + '</span></figcaption>' +
+  function terminadaEn(x) { return x.type === 'movie' ? (x.date || '') : (x.endDate || ''); }
+  function obras(tipo) { return (typeof entries !== 'undefined' ? entries : []).filter(function (x) { return x.type === tipo; }); }
+  function ordenar(lista, orden) {
+    var l = lista.slice();
+    if (orden === 'valoracion') return l.sort(function (a, b) { return (Number(b.rating) || 0) - (Number(a.rating) || 0) || String(a.title || '').localeCompare(String(b.title || ''), 'es'); });
+    if (orden === 'titulo') return l.sort(function (a, b) { return String(a.title || '').localeCompare(String(b.title || ''), 'es'); });
+    return l.sort(function (a, b) { return String(b.endDate || b.startDate || b.date || '').localeCompare(String(a.endDate || a.startDate || a.date || '')); });
+  }
+  function lineaFechas(x) {
+    var fin = terminadaEn(x), ini = x.startDate || '';
+    var partes = [];
+    if (x.type === 'movie') { if (fin) partes.push(fCorta(fin)); }
+    else if (fin) partes.push(fCorta(fin));
+    else if (ini) partes.push('desde ' + fCorta(ini));
+    if (Number(x.rating)) partes.push(Number(x.rating) + ' de 5');
+    return partes.join(', ');
+  }
+  function portada(x, grande) {
+    var sub = x.type === 'book' ? (x.author || '') : '';
+    return '<figure class="portada' + (grande ? ' grande' : '') + '"' + (grande ? '' : ' data-obra="' + esc(x.id) + '" tabindex="0" role="button" aria-label="' + esc(x.title || '') + '"') + '>' +
+      '<figcaption><span class="t">' + esc(x.title || '') + '</span>' + (sub ? '<span class="a">' + esc(sub) + '</span>' : '') + '<span class="m">' + esc(lineaFechas(x)) + '</span></figcaption>' +
       (x.portada ? '<img src="' + esc(x.portada) + '" alt="" loading="lazy" referrerpolicy="no-referrer">' : '<div class="sin-imagen"><span>' + esc((x.title || '?').slice(0, 1)) + '</span></div>') +
       '</figure>';
   }
+  function listasDe(x) { return (typeof cultureLists !== 'undefined' && Array.isArray(cultureLists) ? cultureLists : []).filter(function (l) { return (l.entryIds || []).indexOf(x.id) >= 0; }); }
+  function editarObra(x, datos, aviso) {
+    var ref = 'ed_ocio_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+    var l = intento(function () { return aplicarOpConector({ tipo: 'entrada_editar', id: x.id, entryType: x.type, datos: datos }, ref); }, null);
+    if (!l) return ED.aviso('No se ha podido cambiar', true);
+    registrarLineaConector(l, 'editorial');
+    invalidarCachesDerivadas();
+    ED.aviso(aviso);
+    ED.pintarApartado();
+    saveData().catch(function () { ED.aviso('No se ha podido guardar en la nube. Queda en este dispositivo.', true); });
+  }
+  function ficha(x, cfg) {
+    var est = estadoOcio(x), fin = terminadaEn(x), ini = x.startDate || '';
+    var tardo = ini && fin && x.type !== 'movie' ? dias(ini, fin) : null;
+    var enCurso = cfg.curso && est === cfg.curso;
+    var datos = [];
+    if (x.type === 'book' && x.author) datos.push(fila('Autor', esc(x.author)));
+    if (x.type !== 'movie') datos.push(fila('Estado', esc(est || 'Sin estado')));
+    if (ini && x.type !== 'movie') datos.push(fila('Empezado', esc(fLarga(ini))));
+    if (fin) datos.push(fila(x.type === 'movie' ? 'Vista' : 'Terminado', esc(fLarga(fin))));
+    if (tardo !== null && tardo >= 0) datos.push(fila('Tiempo', tardo + (tardo === 1 ? ' día' : ' días')));
+    else if (enCurso && ini) datos.push(fila('Lleva', dias(ini, hoy()) + ' días'));
+    var ls = listasDe(x);
+    if (ls.length) datos.push(fila('Listas', esc(ls.map(function (l) { return l.name; }).join(', '))));
+    if ((x.tags || []).length) datos.push(fila('Etiquetas', esc(x.tags.join(', '))));
+    var valor = Number(x.rating) || 0;
+    var estrellas = '<p class="rot sep-rot">Tu valoración</p><p class="valorar">' + [1, 2, 3, 4, 5].map(function (n) {
+      return '<button type="button" class="nota' + (n <= valor ? ' llena' : '') + '" data-valorar="' + n + '" aria-label="' + n + ' de 5" aria-pressed="' + (n === valor) + '">' + n + '</button>';
+    }).join('') + '</p>';
+    var acciones = enCurso ? '<button type="button" class="boton lleno" data-terminar>Marcar como ' + (x.type === 'book' ? 'leído' : x.type === 'series' ? 'vista' : 'terminado') + '</button>' : '';
+    var notas = String(x.notes || '').trim();
+    return '<header class="cabecera"><div><h1>' + esc(cfg.nombre) + '</h1><p class="sub"><button type="button" class="enlace" data-cerrar-ficha>Volver a ' + esc(cfg.nombre.toLowerCase()) + '</button></p></div><div class="botones">' + acciones + '</div></header>' +
+      franja(
+        bloque(3, '', portada(x, true)) +
+        bloque(5, may(TYPE_LABEL[x.type] || ''), '<h2 class="titular grande">' + esc(x.title || '') + '</h2>' + filas(datos) + estrellas) +
+        bloque(4, 'Notas', notas ? '<div class="texto-columna"><p>' + esc(notas).replace(/\n{2,}/g, '</p><p>').replace(/\n/g, '<br>') + '</p></div>' : vacio('Sin notas.')), true);
+  }
+  var TYPE_LABEL = { book: 'libro', series: 'serie', movie: 'película', game: 'videojuego' };
+  function cifrasDelAnio() {
+    var anio = String(new Date().getFullYear());
+    function n(tipo, cond) { return obras(tipo).filter(cond).length; }
+    return [
+      ['Libros leídos', n('book', function (x) { return estadoOcio(x) === 'Completado' && String(x.endDate || '').slice(0, 4) === anio; })],
+      ['Series vistas', n('series', function (x) { return estadoOcio(x) === 'Completada' && String(x.endDate || '').slice(0, 4) === anio; })],
+      ['Películas', n('movie', function (x) { return String(x.date || '').slice(0, 4) === anio; })],
+      ['Juegos terminados', n('game', function (x) { return estadoOcio(x) === 'Completado' && String(x.endDate || '').slice(0, 4) === anio; })]
+    ];
+  }
   definir('ocio', {
-    nombre: 'Ocio', pestanas: Object.keys(OCIO).map(function (k) { return { id: k, nombre: OCIO[k].nombre }; }),
+    nombre: 'Ocio', pestanas: Object.keys(OCIO).map(function (k) { return { id: k, nombre: OCIO[k].nombre }; }).concat([{ id: 'listas', nombre: 'Listas' }]),
+    contexto: function (e) {
+      var html = '<p class="rot">Este año</p><ul class="filas mini">' + cifrasDelAnio().map(function (c) { return fila(c[0], String(c[1])); }).join('') + '</ul>';
+      if (e.pestana !== 'listas') html += '<p class="rot" style="margin-top:12px">Orden</p>' + opciones('orden', e.orden, [['recientes', 'Recientes'], ['valoracion', 'Mejor valorados'], ['titulo', 'Título']]);
+      return html;
+    },
+    escape: function (e) { if (!e.ficha) return false; e.ficha = null; ED.pintarApartado(); return true; },
     pintar: function (pagina, e) {
+      if (e.pestana === 'listas') {
+        var ls = (typeof cultureLists !== 'undefined' && Array.isArray(cultureLists) ? cultureLists : []);
+        ls = buscar(ls, e, function (l) { return l.name || ''; });
+        var todas = typeof entries !== 'undefined' ? entries : [];
+        pagina.innerHTML = cab('Listas', ls.length + (ls.length === 1 ? ' lista' : ' listas')) + (ls.length ? ls.map(function (l, i) {
+          var de = todas.filter(function (x) { return (l.entryIds || []).indexOf(x.id) >= 0; });
+          return franja(bloque(12, esc(l.name || 'Lista') + ' <i class="marca">(' + de.length + ')</i>', de.length ? '<div class="portadas">' + de.slice(0, 12).map(function (x) { return portada(x); }).join('') + '</div>' : vacio('Vacía.')), i === 0);
+        }).join('') : franja(bloque(12, '', vacio('Sin listas. Se crean en Bitácora, en Ocio.')), true));
+        return;
+      }
       var cfg = OCIO[e.pestana] || OCIO.libros;
-      var todos = buscar((typeof entries !== 'undefined' ? entries : []).filter(function (x) { return x.type === cfg.tipo; }), e, function (x) { return (x.title || '') + ' ' + (x.author || '') + ' ' + (x.platform || ''); })
-        .sort(function (a, b) { return String(b.endDate || b.startDate || b.date || '').localeCompare(String(a.endDate || a.startDate || a.date || '')); });
-      var html = cfg.grupos.map(function (g) {
+      if (e.ficha) {
+        var x = obras(cfg.tipo).find(function (o) { return o.id === e.ficha; });
+        if (x) { pagina.innerHTML = ficha(x, cfg); return; }
+        e.ficha = null;
+      }
+      var todos = ordenar(buscar(obras(cfg.tipo), e, function (x) { return (x.title || '') + ' ' + (x.author || '') + ' ' + (x.tags || []).join(' '); }), e.orden);
+      var html = cfg.grupos.map(function (g, i) {
         var de = g[0] === '_todas' ? todos : todos.filter(function (x) { return estadoOcio(x) === g[0]; });
-        if (!de.length && g[0] !== cfg.grupos[0][0]) return '';
-        var p = porPaginas(de, e, 12);
-        return franja(bloque(12, g[1] + ' <i class="marca">(' + de.length + ')</i>', de.length ? '<div class="portadas">' + (g === cfg.grupos[0] ? p.trozo : de.slice(0, 12)).map(portada).join('') + '</div>' + (g === cfg.grupos[0] ? p.pie : '') : vacio('Nada todavía. Escribe «' + ({ book: 'libro', series: 'serie', movie: 'peli', game: 'juego' })[cfg.tipo] + ' …» en apuntar.')), g === cfg.grupos[0]);
+        if (!de.length && i > 0) return '';
+        var p = i === 0 ? porPaginas(de, e, 14) : { trozo: de.slice(0, 14), pie: de.length > 14 ? '<p class="nota-cifra pie-grafica">y ' + (de.length - 14) + ' más: búscalos en el margen</p>' : '' };
+        return franja(bloque(12, g[1] + ' <i class="marca">(' + de.length + ')</i>', de.length ? '<div class="portadas">' + p.trozo.map(function (x) { return portada(x); }).join('') + '</div>' + p.pie : vacio('Nada todavía. Escribe «' + cfg.palabra + ' …» en apuntar.')), i === 0);
       }).join('');
       pagina.innerHTML = cab(cfg.nombre, todos.length + ' en total') + html;
+    },
+    clicPagina: function (ev, e) {
+      var o = ev.target.closest('[data-obra]'), cerrar = ev.target.closest('[data-cerrar-ficha]'), v = ev.target.closest('[data-valorar]'), t = ev.target.closest('[data-terminar]');
+      if (o) {
+        var tipo = (typeof entries !== 'undefined' ? entries : []).find(function (x) { return x.id === o.dataset.obra; });
+        if (tipo && e.pestana === 'listas') e.pestana = TIPO_A_PESTANA[tipo.type] || e.pestana;
+        e.ficha = o.dataset.obra; return ED.pintarApartado();
+      }
+      if (cerrar) { e.ficha = null; return ED.pintarApartado(); }
+      var cfg = OCIO[e.pestana] || OCIO.libros;
+      var x = e.ficha && obras(cfg.tipo).find(function (y) { return y.id === e.ficha; });
+      if (!x) return;
+      if (v) { var n = +v.dataset.valorar; return editarObra(x, { rating: n === Number(x.rating) ? 0 : n }, n === Number(x.rating) ? 'Valoración quitada' : 'Valorado con ' + n + ' de 5'); }
+      if (t) return editarObra(x, { endDate: hoy(), status: cfg.fin }, '«' + (x.title || '') + '» terminado hoy');
     }
   });
 })(window.ED);

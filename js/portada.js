@@ -461,13 +461,16 @@ window.ED.apartados = window.ED.apartados || {};
     var enCampo = /^(INPUT|TEXTAREA|SELECT)$/.test(activo.tagName || '') && activo.offsetParent !== null;
     if (ev.key === 'Escape') {
       if (enCampo && document.activeElement.value) return;
-      if (ED.apartados[ED.vista]) { ev.preventDefault(); volverAlIndice(); }
+      var apE = ED.apartados[ED.vista];
+      if (apE && apE.escape && apE.escape(estado[ED.vista])) { ev.preventDefault(); return; }
+      if (apE) { ev.preventDefault(); volverAlIndice(); }
       else if (ED.vista === 'ajustes') { ev.preventDefault(); volverDeAjustes(); }
       return;
     }
     if (enCampo || ED.capaAbierta()) return;
     if (ED.vista !== 'acceso' && !ev.ctrlKey && !ev.metaKey && !ev.altKey) {
       if (ev.key === ' ' && ED.vista !== 'ajustes') { ev.preventDefault(); return ED.abrirApuntar(); }
+      if (ev.key === 'Enter' && document.activeElement && document.activeElement.dataset && document.activeElement.dataset.obra) { ev.preventDefault(); return document.activeElement.click(); }
       if (ev.key === 'Enter' && !(document.activeElement && /^(BUTTON|A)$/.test(document.activeElement.tagName))) { ev.preventDefault(); return ED.abrirIr(); }
     }
     var ap = ED.apartados[ED.vista];

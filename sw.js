@@ -1,7 +1,7 @@
 // Service worker de Bitácora Editorial: guarda la página, la lógica de Bitácora que carga desde appbitacora.es, la
 // librería de Supabase y las fuentes, para abrirla sin conexión. Los datos sin conexión ya los lleva loadData con su
 // copia en IndexedDB. Al cambiar algún archivo propio, subir VERSION (la misma ?v= de index.html).
-const VERSION = '24';
+const VERSION = '25';
 const CASCARON = 'editorial-' + VERSION;
 const COPIAS = 'editorial-copias';
 const PROPIOS = ['./', 'index.html', 'manifest.json', 'favicon-32.png', 'img/paisaje.webp', 'img/icono-192.png',

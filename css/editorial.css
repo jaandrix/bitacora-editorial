@@ -525,3 +525,20 @@ body.en-lamina .nota-ed { color: var(--tinta-int); text-shadow: none; bottom: ca
   .mes { grid-auto-rows: minmax(54px, auto); }
   .portadas { grid-template-columns: repeat(3, 1fr); }
 }
+
+
+/* Ocio: autor, ficha y valoración */
+.portada[data-obra] { cursor: pointer; transition: transform 160ms cubic-bezier(.2,.7,.2,1); }
+.portada[data-obra]:hover, .portada[data-obra]:focus-visible { transform: translateY(-2px); outline: none; }
+.portada .a { font-size: max(8px, calc(8.4 * var(--u))); font-style: italic; opacity: .85; }
+.portada.grande { max-width: calc(200 * var(--u)); width: 100%; }
+.portada.grande .t { font-size: max(12px, calc(13 * var(--u))); -webkit-line-clamp: 4; }
+.portada.grande .a, .portada.grande .m { font-size: max(9.5px, calc(10 * var(--u))); }
+.valorar { display: flex; gap: 4px; margin: 0; }
+.valorar .nota { width: max(22px, calc(22 * var(--u))); height: max(22px, calc(22 * var(--u))); border: 1px solid var(--tinta-int); background: transparent; color: var(--tinta-int); border-radius: 0; cursor: pointer; font: max(9.5px, calc(9.5 * var(--u))) / 1 var(--serif); font-variant-numeric: tabular-nums; }
+.valorar .nota.llena { background: var(--tinta-int); color: var(--marfil); }
+.valorar .nota:hover { background: color-mix(in srgb, var(--tinta-int) 20%, transparent); }
+.valorar .nota.llena:hover { background: color-mix(in srgb, var(--tinta-int) 80%, transparent); }
+.margen .filas.mini { font-size: max(11px, calc(11.2 * var(--u))); }
+.margen .filas.mini li { border-bottom-color: color-mix(in srgb, currentColor 25%, transparent); padding: 2px 0; }
+@media (prefers-reduced-motion: reduce) { .portada[data-obra] { transition: none; } .portada[data-obra]:hover { transform: none; } }

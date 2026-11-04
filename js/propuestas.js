@@ -5,7 +5,7 @@ window.ED = window.ED || {};
 window.ED.apartados = window.ED.apartados || {};
 (function (ED) {
   var POR_PAGINA = 20;
-  var ORIGEN = { apuntar: 'De apuntar', auto: 'De conector', validado: 'De conector, validado', descartado: 'Descartado' };
+  var ORIGEN = { editorial: 'De la edición', apuntar: 'De apuntar', auto: 'De conector', validado: 'De conector, validado', descartado: 'Descartado' };
   var leido = 0;
 
   function esc(t) { return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
