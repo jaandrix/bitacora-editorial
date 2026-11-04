@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;1,8..60,400&display=swap" rel="stylesheet">
 <link rel="preload" as="image" href="img/paisaje.webp" type="image/webp">
-<link rel="stylesheet" href="css/editorial.css?v=16">
+<link rel="stylesheet" href="css/editorial.css?v=21">
 </head>
 <body>
 <div class="paisaje" id="ed-paisaje" aria-hidden="true"></div>
@@ -49,7 +49,6 @@
     <ul class="datos">
       <li><span class="rotulo">Hoy</span><span class="valor" id="ed-hoy"></span></li>
       <li><span class="rotulo">Próximo</span><span class="valor" id="ed-proximo"></span></li>
-      <li><span class="rotulo">Saldo</span><span class="valor" id="ed-saldo"></span></li>
       <li><span class="rotulo" id="ed-ciudad">Tiempo</span><span class="valor" id="ed-tiempo"></span></li>
     </ul>
     <div class="acciones">
@@ -91,14 +90,6 @@
     </ul>
   </nav>
 
-  <section class="col" aria-labelledby="h-tono">
-    <h2 id="h-tono">Tono</h2>
-    <div class="selector">
-      <label class="oculto" for="ed-tono">Tono</label>
-      <select id="ed-tono" class="ed-tono"></select>
-      <svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1.5 3.5 5 7l3.5-3.5"/></svg>
-    </div>
-  </section>
 </main>
 
 <main class="pliego ajustes-pliego" id="ed-ajustes-pliego" hidden>
@@ -155,11 +146,11 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
-<script src="js/logica.js?v=16"></script>
-<script src="js/fondo.js?v=16"></script>
-<script src="js/capa.js?v=16"></script>
-<script src="js/propuestas.js?v=16"></script>
-<script src="js/finanzas.js?v=16"></script>
-<script src="js/portada.js?v=16"></script>
+<script src="js/logica.js?v=21"></script>
+<script src="js/fondo.js?v=21"></script>
+<script src="js/capa.js?v=21"></script>
+<script src="js/propuestas.js?v=21"></script>
+<script src="js/finanzas.js?v=21"></script>
+<script src="js/portada.js?v=21"></script>
 </body>
 </html>

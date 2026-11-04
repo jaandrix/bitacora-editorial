@@ -395,3 +395,77 @@ body.en-lamina .nota-ed { color: var(--tinta-int); text-shadow: none; bottom: ca
   .esquina { top: calc(56px + env(safe-area-inset-top)); left: 16px; right: auto; }
   .pliego { padding-top: calc(104px + env(safe-area-inset-top)); }
 }
+
+/* Tono: un desplegable sencillo, sin caja, solo la palabra subrayada */
+.selector { width: auto; display: inline-block; }
+.selector select { height: auto; padding: 2px calc(18 * var(--u)) 4px 0; border: 0; border-bottom: 1px solid color-mix(in srgb, currentColor 60%, transparent); }
+.selector select:focus { border-bottom-color: currentColor; }
+.selector svg { right: 0; }
+
+/* ============ LÁMINA, segunda versión: escala de periódico, más pequeña, y columnas cuadradas ============ */
+.pagina { padding: calc(18 * var(--u)) calc(26 * var(--u)) calc(12 * var(--u)); }
+.cabecera { padding-bottom: calc(9 * var(--u)); align-items: flex-end; }
+.cabecera h1 { font-size: max(21px, calc(24 * var(--u))); letter-spacing: -.01em; }
+.cabecera .sub { margin-top: calc(4 * var(--u)); font-size: max(11px, calc(11.2 * var(--u))); }
+.boton { height: max(21px, calc(21 * var(--u))); padding: 0 calc(10 * var(--u)); font-size: max(8.5px, calc(8.6 * var(--u))); }
+.franja { column-gap: 0; padding: calc(11 * var(--u)) 0; }
+.bloque { padding: 0 calc(14 * var(--u)); }
+.bloque + .bloque { border-left: 1px solid color-mix(in srgb, var(--tinta-int) 28%, transparent); padding-left: calc(14 * var(--u)); margin-left: 0; }
+.franja > .bloque:first-child { padding-left: 0; }
+.franja > .bloque:last-child { padding-right: 0; }
+.rot, .lamina .rot { font-size: max(8.5px, calc(8.6 * var(--u))); margin: 0 0 calc(7 * var(--u)); letter-spacing: .14em; }
+.cifra { font-size: max(22px, calc(26 * var(--u))); margin: calc(1 * var(--u)) 0 calc(5 * var(--u)); }
+.nota-cifra { font-size: max(8.5px, calc(8.6 * var(--u))); }
+.texto-bloque { margin: 0 0 calc(7 * var(--u)); font-style: italic; font-size: max(11px, calc(11.4 * var(--u))); line-height: 1.4; }
+.filas { font-size: max(11px, calc(11.2 * var(--u))); }
+.filas li { padding: calc(3.4 * var(--u)) 0; gap: 8px; }
+.filas li > span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.filas .total { font-weight: 500; }
+.filas.al-pie { margin-top: auto; }
+.marca { font-style: italic; opacity: .7; font-size: .95em; }
+.presu .barra, .barras .barra { margin-top: calc(3 * var(--u)); }
+.barras li { display: block; }
+.barras .barra { height: 1px; background: color-mix(in srgb, var(--tinta-int) 20%, transparent); position: relative; }
+.barras .barra i { position: absolute; left: 0; top: -1px; height: 3px; background: color-mix(in srgb, var(--tinta-int) 70%, transparent); }
+.avisos li .enlace { font-size: max(8.5px, calc(8.6 * var(--u))); letter-spacing: .12em; text-transform: uppercase; }
+.cab-bloque { align-items: center; margin-bottom: calc(2 * var(--u)); }
+.cab-bloque .rot { margin: 0; }
+.enlace.mini { font-size: max(8.5px, calc(8.6 * var(--u))); letter-spacing: .12em; text-transform: uppercase; }
+.rangos button { height: max(17px, calc(17 * var(--u))); padding: 0 calc(7 * var(--u)); font-size: max(8px, calc(8 * var(--u))); }
+.grafica-caja { position: relative; flex: 1; min-height: calc(70 * var(--u)); display: flex; margin-top: calc(6 * var(--u)); }
+.grafica-caja .grafica { margin: 0; min-height: 0; flex: 1; height: auto; }
+.eje-y { position: absolute; left: 0; font-size: max(8px, calc(8 * var(--u))); letter-spacing: .06em; opacity: .6; font-variant-numeric: tabular-nums; background: var(--marfil); padding-right: 4px; }
+.eje-y.arriba { top: 0; } .eje-y.abajo { bottom: 0; }
+.ejes { font-size: max(8px, calc(8 * var(--u))); }
+.pie-grafica { margin: calc(4 * var(--u)) 0 0; text-align: right; }
+.tabla { font-size: max(10.8px, calc(11 * var(--u))); table-layout: fixed; }
+.tabla th { font-size: max(8px, calc(8.2 * var(--u))); padding-bottom: calc(5 * var(--u)); }
+.tabla td { padding: calc(3.2 * var(--u)) 0; }
+.tabla td + td, .tabla th + th { padding-left: calc(12 * var(--u)); }
+.tabla .fecha-t { width: 9%; }
+.tabla .cat { width: 17%; }
+.tabla .cta-t { width: 11%; }
+.tabla .imp-t { width: 13%; }
+.tabla .saldo-t { width: 13%; }
+.tabla.compacta .fecha-t { width: 9%; } .tabla.compacta .cat { width: 17%; } .tabla.compacta .imp-t { width: 13%; }
+.tabla tr.pasado td { color: #9A4436; }
+.tabla.meses .barra-t { width: 34%; }
+.doble { display: flex; flex-direction: column; gap: 2px; }
+.doble i { display: block; height: 2px; }
+.doble .entra { background: var(--tinta-int); }
+.doble .sale { background: #B85F50; }
+.sep-rot { margin-top: calc(12 * var(--u)) !important; }
+.filtros { line-height: 1.6; }
+.filtros .actual, .margen .enlace.actual { text-decoration: underline; text-underline-offset: .22em; text-decoration-thickness: 1px; }
+.paginacion { font-size: max(8.5px, calc(8.6 * var(--u))); }
+.margen .firma { font-size: max(13px, calc(14 * var(--u))); }
+.pestanas button { font-size: max(12px, calc(12.4 * var(--u))); padding: calc(6.5 * var(--u)) calc(6 * var(--u)); }
+.margen .contexto { font-size: max(11px, calc(11.4 * var(--u))); }
+.margen hr { margin: calc(14 * var(--u)) 0; }
+.franja.crece { min-height: auto; }
+.barras .linea-presu { display: flex; justify-content: space-between; gap: 10px; }
+.barras .linea-presu > span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.franja { padding: calc(9 * var(--u)) 0; }
+.grafica-caja { min-height: calc(54 * var(--u)); }
+.filas li { padding: calc(3 * var(--u)) 0; }
+.tabla td { padding: calc(2.8 * var(--u)) 0; }

@@ -165,7 +165,6 @@ window.ED.apartados = window.ED.apartados || {};
       $('ed-proximo').textContent = 'Nada en las próximas semanas';
     }
 
-    try { $('ed-saldo').textContent = financeMoney(financeProTotalBalance()); } catch (e) { $('ed-saldo').textContent = ''; }
 
     var n = { hoy: delDia.length, planificador: tareas.length, envios: enCamino.length, propuestas: ED.numPropuestas ? ED.numPropuestas() : 0 };
     document.querySelectorAll('[data-n]').forEach(function (el) { var v = n[el.dataset.n]; el.textContent = v ? '(' + v + ')' : ''; });
